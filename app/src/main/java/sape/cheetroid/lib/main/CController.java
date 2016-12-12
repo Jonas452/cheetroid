@@ -2,7 +2,11 @@ package sape.cheetroid.lib.main;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import sape.cheetroid.lib.database.DatabaseConnector;
 
@@ -36,6 +40,8 @@ public class CController
 
         this.myModel = myModel;
 
+        this.tableName = CModel.getTableName( this.myModel );
+
     }
 
     /*
@@ -46,7 +52,7 @@ public class CController
     whereClause = The filters of the select (null to no filter);
     orderBy = The orderBy params (null to no order);
     */
-    public ArrayList<Object> selectAll( String whereClause, String orderBy )
+    public ArrayList<Object> selectAll( String whereClause, String orderByClause )
     {
 
         databaseConnector.open();
@@ -58,7 +64,7 @@ public class CController
                 null,
                 null,
                 null,
-                orderBy );
+                orderByClause );
 
         ArrayList<Object> arrayListMyModel= cursorToArrayListMyModel( cursor );
 
@@ -71,7 +77,112 @@ public class CController
     private ArrayList<Object> cursorToArrayListMyModel( Cursor cursor )
     {
 
-        ArrayList<Object> myModel = new ArrayList<Object>();
+        ArrayList<Object> myModelArrayList = null;
+
+        if( cursor != null && cursor.moveToFirst() )
+        {
+
+            myModelArrayList = new ArrayList<Object>();
+
+            do
+            {
+
+                myModelArrayList.add( cursorToMyModel( cursor ) );
+
+            }while( cursor.moveToNext() );
+
+        }
+
+        return myModelArrayList;
+
+    }
+
+    private Object cursorToMyModel( Cursor cursor )
+    {
+
+        Object myObject = newInstanceMyModel();
+
+        Field[] myObjectFields = myObject.getClass().getFields();
+
+        for( Field tempField : myObjectFields )
+        {
+
+            int fieldIndex = cursor.getColumnIndex( tempField.getName() );
+
+            if( fieldIndex != - 1 )
+            {
+
+                try
+                {
+
+                    if( int.class == tempField.getType() )
+                    {
+
+                        tempField.setInt( myObject, cursor.getInt( fieldIndex ) );
+
+                    }else if( long.class == tempField.getType() )
+                    {
+
+                        tempField.setLong( myObject, cursor.getLong( fieldIndex ) );
+
+                    }else if( double.class == tempField.getType() )
+                    {
+
+                        tempField.setDouble( myObject, cursor.getDouble( fieldIndex ) );
+
+                    }else if( String.class == tempField.getType() )
+                    {
+
+                        tempField.set( myObject, cursor.getString( fieldIndex ) );
+
+                    }
+
+                }catch( IllegalAccessException e )
+                {
+
+                    e.printStackTrace();
+
+                }
+
+            }
+
+        }
+
+        return myObject;
+
+    }
+
+    private Object newInstanceMyModel()
+    {
+
+        try
+        {
+
+            Constructor constructor = myModel.getConstructor();
+
+            return constructor.newInstance();
+
+        }catch( InstantiationException e )
+        {
+
+            e.printStackTrace();
+
+        }catch( IllegalAccessException e )
+        {
+
+            e.printStackTrace();
+
+        }catch( NoSuchMethodException e )
+        {
+
+            e.printStackTrace();
+
+        }catch( InvocationTargetException e )
+        {
+
+            e.printStackTrace();
+
+        }
 
         return null;
 
