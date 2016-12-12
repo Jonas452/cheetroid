@@ -19,21 +19,31 @@ import sape.cheetroid.lib.util.Util;
 public class CModel
 {
 
-    public boolean hasData = false;
+    private String tableName;
+    private String primaryKeyName;
 
-    public CModel() {}
+    public CModel()
+    {
+
+        setTableName();
+        setPrimaryKeyName();
+
+    }
 
     public CModel( long keyValue, Context context )
     {
+
+        setTableName();
+        setPrimaryKeyName();
 
         DatabaseConnector databaseConnector = new DatabaseConnector( context );
 
         databaseConnector.open();
 
         Cursor cursor = databaseConnector.getDatabase().query(
-                CModel.getTableName( this.getClass() ),
+                tableName,
                 null,
-                CModel.getPrimartyKeyName( this.getClass() ) + " = " + keyValue,
+                primaryKeyName + " = " + keyValue,
                 null,
                 null,
                 null,
@@ -46,6 +56,11 @@ public class CModel
 
             this.fromHashMap( hashMap );
 
+        }else
+        {
+
+            this.setPrimaryKeyToNegative();
+
         }
 
         databaseConnector.close();
@@ -55,12 +70,18 @@ public class CModel
     public CModel( HashMap<String, String> hashMap )
     {
 
+        setTableName();
+        setPrimaryKeyName();
+
         this.fromHashMap( hashMap );
 
     }
 
     public CModel( JSONObject jsonObject )
     {
+
+        setTableName();
+        setPrimaryKeyName();
 
         for( Field field : this.getClass().getFields() )
         {
@@ -70,8 +91,6 @@ public class CModel
 
                 if( jsonObject.has( field.getName() ) )
                 {
-
-                    hasData = true;
 
                     if( int.class == field.getType() )
                     {
@@ -180,195 +199,6 @@ public class CModel
 
     }
 
-    public boolean store( Context context )
-    {
-
-        boolean wasStore;
-
-        if( hasPrimaryKeyValue() )
-            wasStore = update( context );
-        else
-            wasStore = insert( context );
-
-        return wasStore;
-
-    }
-
-    private boolean insert( Context context )
-    {
-
-        long insertedSuccessfully;
-
-        DatabaseConnector databaseConnector = new DatabaseConnector( context );
-
-        ContentValues contentValues = this.toContentValues( false );
-
-        databaseConnector.open();
-
-        insertedSuccessfully = databaseConnector.getDatabase().insert(
-                CModel.getTableName( this.getClass() ),
-                null,
-                contentValues );
-
-        databaseConnector.close();
-
-        this.setValueToPrimaryKey( insertedSuccessfully );
-
-        if( insertedSuccessfully >= 0 )
-            return true;
-        else
-            return false;
-
-    }
-
-    private boolean update( Context context )
-    {
-
-        DatabaseConnector databaseConnector = new DatabaseConnector( context );
-
-        long updatedSuccessfully;
-
-        databaseConnector.open();
-
-        updatedSuccessfully = databaseConnector.getDatabase().update(
-                CModel.getTableName( this.getClass() ),
-                this.toContentValues( true ),
-                CModel.getPrimartyKeyName( this.getClass() ) + " = " + this.getPrimaryKeyValue(),
-                null);
-
-        databaseConnector.close();
-
-        if( updatedSuccessfully >= 0 )
-            return true;
-        else
-            return false;
-
-    }
-
-    public boolean delete(  Context context  )
-    {
-
-        DatabaseConnector databaseConnector = new DatabaseConnector( context );
-
-        long deletedSuccessfully;
-
-        databaseConnector.open();
-
-        deletedSuccessfully = databaseConnector.getDatabase().delete(
-                CModel.getTableName( this.getClass() ),
-                 CModel.getPrimartyKeyName( this.getClass() ) + " = " + this.getPrimaryKeyValue(),
-                null);
-
-        databaseConnector.close();
-
-        if( deletedSuccessfully > 0 )
-            return true;
-        else
-            return false;
-
-    }
-
-    private boolean hasPrimaryKeyValue()
-    {
-
-        if( getPrimaryKeyValue() == 0 )
-            return false;
-        else
-            return true;
-
-    }
-
-    public static String getPrimartyKeyName( Class myModel )
-    {
-
-        Field[] fields = myModel.getFields();
-
-        for( Field field : fields )
-        {
-
-            if( field.isAnnotationPresent( CPrimaryKey.class ) )
-                return field.getName();
-
-        }
-
-        return null;
-
-    }
-
-    public static String getTableName( Class myModel )
-    {
-
-        if( myModel.isAnnotationPresent( CTableAnno.class ) )
-        {
-
-            CTableAnno annoTable = (CTableAnno) myModel.getAnnotation( CTableAnno.class );
-            return annoTable.tableName();
-
-        }
-
-        return null;
-
-    }
-
-    private void setValueToPrimaryKey( long value )
-    {
-
-        try
-        {
-
-            Field field = this.getClass().getDeclaredField( CModel.getPrimartyKeyName( this.getClass() ) );
-
-            if( int.class == field.getType() )
-            {
-
-                field.setInt( this, (int) value );
-
-            }else if( long.class == field.getType() ) {
-
-                field.setLong( this, value );
-
-            }
-
-        }catch ( NoSuchFieldException e )
-        {
-
-            e.printStackTrace();
-
-        } catch (IllegalAccessException e)
-        {
-
-            e.printStackTrace();
-
-        }
-
-    }
-
-    private long getPrimaryKeyValue()
-    {
-
-        try
-        {
-
-            Field field = this.getClass().getDeclaredField( CModel.getPrimartyKeyName( this.getClass() ) );
-
-            return field.getLong( this );
-
-        }catch ( NoSuchFieldException e )
-        {
-
-            e.printStackTrace();
-
-        } catch (IllegalAccessException e)
-        {
-
-            e.printStackTrace();
-
-        }
-
-        return 0;
-
-    }
-
     private void fromHashMap( HashMap<String, String> hashMap )
     {
 
@@ -377,8 +207,6 @@ public class CModel
 
             if( hashMap.containsKey( field.getName() ) )
             {
-
-                hasData = true;
 
                 try
                 {
@@ -424,5 +252,250 @@ public class CModel
         }
 
     }
+
+    //------------- BEGIN DATABASE METHODS -------------------
+
+    public boolean store( Context context )
+    {
+
+        boolean wasStore;
+
+        if( hasPrimaryKeyValue() )
+            wasStore = update( context );
+        else
+            wasStore = insert( context );
+
+        return wasStore;
+
+    }
+
+    private boolean insert( Context context )
+    {
+
+        long insertedSuccessfully;
+
+        DatabaseConnector databaseConnector = new DatabaseConnector( context );
+
+        ContentValues contentValues = this.toContentValues( false );
+
+        databaseConnector.open();
+
+        insertedSuccessfully = databaseConnector.getDatabase().insert(
+                tableName,
+                null,
+                contentValues );
+
+        databaseConnector.close();
+
+        this.setValueToPrimaryKey( insertedSuccessfully );
+
+        if( insertedSuccessfully >= 0 )
+            return true;
+        else
+            return false;
+
+    }
+
+    private boolean update( Context context )
+    {
+
+        DatabaseConnector databaseConnector = new DatabaseConnector( context );
+
+        long updatedSuccessfully;
+
+        databaseConnector.open();
+
+        updatedSuccessfully = databaseConnector.getDatabase().update(
+                tableName,
+                this.toContentValues( true ),
+                primaryKeyName + " = " + this.getPrimaryKeyValue(),
+                null);
+
+        databaseConnector.close();
+
+        if( updatedSuccessfully >= 0 )
+            return true;
+        else
+            return false;
+
+    }
+
+    public boolean delete(  Context context  )
+    {
+
+        DatabaseConnector databaseConnector = new DatabaseConnector( context );
+
+        long deletedSuccessfully;
+
+        databaseConnector.open();
+
+        deletedSuccessfully = databaseConnector.getDatabase().delete(
+               tableName,
+               primaryKeyName + " = " + this.getPrimaryKeyValue(),
+               null);
+
+        databaseConnector.close();
+
+        if( deletedSuccessfully > 0 )
+            return true;
+        else
+            return false;
+
+    }
+
+    //------------- END DATABASE METHODS ----------------------
+
+    //------------- BEGIN TABLE HANDLING ----------------------
+
+    public static String getTableName( Class myModel )
+    {
+
+        if( myModel.isAnnotationPresent( CTableAnno.class ) )
+        {
+
+            CTableAnno annoTable = (CTableAnno) myModel.getAnnotation( CTableAnno.class );
+            return annoTable.tableName();
+
+        }
+
+        return null;
+
+    }
+
+    private long getPrimaryKeyValue()
+    {
+
+        try
+        {
+
+            Field field = this.getClass().getDeclaredField( primaryKeyName );
+
+            return field.getLong( this );
+
+        }catch ( NoSuchFieldException e )
+        {
+
+            e.printStackTrace();
+
+        } catch (IllegalAccessException e)
+        {
+
+            e.printStackTrace();
+
+        }
+
+        return 0;
+
+    }
+
+    public static String getPrimaryKeyName(Class myModel )
+    {
+
+        Field[] fields = myModel.getFields();
+
+        for( Field field : fields )
+        {
+
+            if( field.isAnnotationPresent( CPrimaryKey.class ) )
+                return field.getName();
+
+        }
+
+        return null;
+
+    }
+
+    private boolean hasPrimaryKeyValue()
+    {
+
+        if( getPrimaryKeyValue() > 0 )
+            return true;
+        else
+            return false;
+
+    }
+
+    private void setValueToPrimaryKey( long value )
+    {
+
+        try
+        {
+
+            Field field = this.getClass().getDeclaredField( CModel.getPrimaryKeyName( this.getClass() ) );
+
+            if( int.class == field.getType() )
+            {
+
+                field.setInt( this, (int) value );
+
+            }else if( long.class == field.getType() ) {
+
+                field.setLong( this, value );
+
+            }
+
+        }catch ( NoSuchFieldException e )
+        {
+
+            e.printStackTrace();
+
+        } catch (IllegalAccessException e)
+        {
+
+            e.printStackTrace();
+
+        }
+
+    }
+
+    private void setPrimaryKeyToNegative()
+    {
+
+        try
+        {
+
+            Field field = this.getClass().getDeclaredField( primaryKeyName );
+
+            if( int.class == field.getType() )
+            {
+
+                field.setInt( this, (int) -1 );
+
+            }else if( long.class == field.getType() )
+            {
+
+                field.setLong( this, -1 );
+
+            }
+
+        }catch( NoSuchFieldException e )
+        {
+
+            e.printStackTrace();
+
+        }catch( IllegalAccessException e )
+        {
+
+            e.printStackTrace();
+
+        }
+
+    }
+
+    private void setTableName()
+    {
+
+        this.tableName = getTableName( this.getClass() );
+
+    }
+
+    private void setPrimaryKeyName()
+    {
+
+        this.primaryKeyName = getPrimaryKeyName( this.getClass() );
+
+    }
+
+    //--------------- END TABLE HANDLING ---------------------
 
 }

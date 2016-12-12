@@ -1,13 +1,9 @@
 package sape.cheetroid.lib.main;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-
-import sape.cheetroid.lib.util.Util;
 import sape.cheetroid.lib.database.DatabaseConnector;
 
 /*
@@ -20,7 +16,6 @@ public class CController
     private DatabaseConnector databaseConnector;
 
     private String tableName;
-    private String primaryKeyName;
 
     private Class myModel;
 
@@ -41,10 +36,6 @@ public class CController
 
         this.myModel = myModel;
 
-        this.tableName = CModel.getTableName( myModel );
-
-        this.primaryKeyName = CModel.getPrimartyKeyName( myModel );
-
     }
 
     /*
@@ -55,7 +46,7 @@ public class CController
     whereClause = The filters of the select (null to no filter);
     orderBy = The orderBy params (null to no order);
     */
-    public ArrayList<HashMap<String, String>> selectAll( String whereClause, String orderBy )
+    public ArrayList<Object> selectAll( String whereClause, String orderBy )
     {
 
         databaseConnector.open();
@@ -69,11 +60,20 @@ public class CController
                 null,
                 orderBy );
 
-        ArrayList<HashMap<String, String>> arrayListHashMap = Util.cursorToArrayListOfHashMaps( cursor );
+        ArrayList<Object> arrayListMyModel= cursorToArrayListMyModel( cursor );
 
         databaseConnector.close();
 
-        return arrayListHashMap;
+        return arrayListMyModel;
+
+    }
+
+    private ArrayList<Object> cursorToArrayListMyModel( Cursor cursor )
+    {
+
+        ArrayList<Object> myModel = new ArrayList<Object>();
+
+        return null;
 
     }
 

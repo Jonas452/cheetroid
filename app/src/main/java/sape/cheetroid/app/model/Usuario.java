@@ -2,8 +2,6 @@ package sape.cheetroid.app.model;
 
 import android.content.Context;
 
-import org.json.JSONObject;
-
 import sape.cheetroid.lib.database.cfield.CField;
 import sape.cheetroid.lib.main.CModel;
 
@@ -24,9 +22,7 @@ public class Usuario extends CModel
     @CFieldAnno( fieldType = CField.TEXT, isNotNull =  true )
     public String password;
 
-    public Usuario() {}
-
-    public Usuario( JSONObject jsonObject ) { super( jsonObject ); }
+    public Usuario() { }
 
     public Usuario( long id, Context context ) { super( id, context ); }
 

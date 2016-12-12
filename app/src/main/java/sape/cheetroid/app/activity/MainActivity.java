@@ -45,7 +45,7 @@ public class MainActivity extends Activity
 
         Usuario usuarioBuscar = new Usuario( id, getApplicationContext() );
 
-        if( !usuarioBuscar.hasData )
+        if( usuarioBuscar.id != -1 )
             Log.e( "DELETED", "NOT FOUND." );
 
     }
