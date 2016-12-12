@@ -21,10 +21,16 @@ public class MainActivity extends Activity
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_main );
 
+        /*
         UsuarioController usuarioController = new UsuarioController( getApplicationContext() );
 
         for( Usuario usuarioTemp : usuarioController.getAll() )
             Log.e( "USUARIO: ", usuarioTemp.id + " " + usuarioTemp.login + " " + usuarioTemp.password );
+        */
+
+        Usuario usuario = new Usuario( 1, getApplicationContext() );
+
+        Log.e( "USUARIO", usuario.id + " " + usuario.login + " " + usuario.password );
 
     }
 

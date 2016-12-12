@@ -52,9 +52,49 @@ public class CModel
         if( cursor != null && cursor.moveToFirst() )
         {
 
-            HashMap<String, String> hashMap = Util.cursorToHashMap( cursor );
+            for( Field tempField : this.getClass().getFields() )
+            {
 
-            this.fromHashMap( hashMap );
+                int fieldIndex = cursor.getColumnIndex( tempField.getName() );
+
+                if( fieldIndex != - 1 )
+                {
+
+                    try
+                    {
+
+                        if( int.class == tempField.getType() )
+                        {
+
+                            tempField.setInt( this, cursor.getInt( fieldIndex ) );
+
+                        }else if( long.class == tempField.getType() )
+                        {
+
+                            tempField.setLong( this, cursor.getLong( fieldIndex ) );
+
+                        }else if( double.class == tempField.getType() )
+                        {
+
+                            tempField.setDouble( this, cursor.getDouble( fieldIndex ) );
+
+                        }else if( String.class == tempField.getType() )
+                        {
+
+                            tempField.set( this, cursor.getString( fieldIndex ) );
+
+                        }
+
+                    }catch( IllegalAccessException e )
+                    {
+
+                        e.printStackTrace();
+
+                    }
+
+                }
+
+            }
 
         }else
         {
@@ -64,16 +104,6 @@ public class CModel
         }
 
         databaseConnector.close();
-
-    }
-
-    public CModel( HashMap<String, String> hashMap )
-    {
-
-        setTableName();
-        setPrimaryKeyName();
-
-        this.fromHashMap( hashMap );
 
     }
 
@@ -196,60 +226,6 @@ public class CModel
         }
 
         return contentValues;
-
-    }
-
-    private void fromHashMap( HashMap<String, String> hashMap )
-    {
-
-        for( Field field : this.getClass().getFields() )
-        {
-
-            if( hashMap.containsKey( field.getName() ) )
-            {
-
-                try
-                {
-
-                    String value = hashMap.get( field.getName() );
-
-                    if( int.class == field.getType() )
-                    {
-
-                        field.setInt( this, Integer.valueOf( value ) );
-
-                    }else if( long.class == field.getType() )
-                    {
-
-                        field.setLong( this, Long.valueOf( value ) );
-
-                    }else if( double.class == field.getType() )
-                    {
-
-                        field.setDouble( this, Double.valueOf( value ) );
-
-                    }else if( String.class == field.getType() )
-                    {
-
-                        field.set( this, value );
-
-                    }else if( boolean.class == field.getType() )
-                    {
-
-                        field.set( this, Boolean.valueOf( value ) );
-
-                    }
-
-                } catch( IllegalAccessException e )
-                {
-
-                    e.printStackTrace();
-
-                }
-
-            }
-
-        }
 
     }
 
