@@ -51,7 +51,7 @@ public class CController
     whereClause = The filters of the select (null to no filter);
     orderBy = The orderBy params (null to no order);
     */
-    public ArrayList<Object> selectAll( String whereClause, String orderByClause )
+    public <T> ArrayList<T> selectAll( String whereClause, String orderByClause )
     {
 
         databaseConnector.open();
@@ -65,7 +65,7 @@ public class CController
                 null,
                 orderByClause );
 
-        ArrayList<Object> arrayListMyModel= cursorToArrayListMyModel( cursor );
+        ArrayList<T> arrayListMyModel = cursorToArrayListMyModel( cursor );
 
         databaseConnector.close();
 
@@ -73,20 +73,20 @@ public class CController
 
     }
 
-    private ArrayList<Object> cursorToArrayListMyModel( Cursor cursor )
+    private <T> ArrayList<T> cursorToArrayListMyModel( Cursor cursor )
     {
 
-        ArrayList<Object> myModelArrayList = null;
+        ArrayList<T> myModelArrayList = null;
 
         if( cursor != null && cursor.moveToFirst() )
         {
 
-            myModelArrayList = new ArrayList<Object>();
+            myModelArrayList = getModel();
 
             do
             {
 
-                myModelArrayList.add( cursorToMyModel( cursor ) );
+                myModelArrayList.add( (T) cursorToMyModel( cursor ) );
 
             }while( cursor.moveToNext() );
 
@@ -184,6 +184,15 @@ public class CController
         }
 
         return null;
+
+    }
+
+    private <T> ArrayList<T> getModel()
+    {
+
+        ArrayList<T> arrayList = new ArrayList<T>();
+
+        return arrayList;
 
     }
 

@@ -8,7 +8,7 @@ public class DBCTables extends CTablesHandler
 {
 
     /*
-     * Here you must add
+     * TODO  Here you must add
      * all yours tables.
      */
     public DBCTables()

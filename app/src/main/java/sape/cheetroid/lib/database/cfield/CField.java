@@ -40,8 +40,6 @@ public class CField
     public CField( String fieldName, String fieldType, boolean isNotNull )
     {
 
-        //TODO Validate Field Type
-
         this.fieldName = fieldName;
         this.fieldType = fieldType;
 
