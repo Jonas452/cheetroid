@@ -22,10 +22,10 @@ public class UsuarioController extends CController
 
     }
 
-    public ArrayList<Usuario> getAllByMunicipioId( long municipioId )
+    public ArrayList<Usuario> getAllByLogin( String login )
     {
 
-        return  selectAll( "municipio_id = '" + municipioId + "'", "nome" );
+        return  selectAll( "login = '" + login + "'", "login" );
 
     }
 
