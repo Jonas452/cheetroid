@@ -7,7 +7,7 @@ import sape.cheetroid.lib.database.cfield.CField;
 import sape.cheetroid.lib.database.cfield.CFieldAnno;
 import sape.cheetroid.lib.database.cfield.CPrimaryKey;
 import sape.cheetroid.lib.main.CModel;
-import sape.cheetroid.lib.util.CCustomException;
+import sape.cheetroid.lib.exception.CCustomException;
 
 public class CTable
 {

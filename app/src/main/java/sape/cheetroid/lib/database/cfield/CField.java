@@ -1,6 +1,6 @@
 package sape.cheetroid.lib.database.cfield;
 
-import sape.cheetroid.lib.util.CCustomException;
+import sape.cheetroid.lib.exception.CCustomException;
 
 /*
 Author = Jonas Jordão de Macêdo;

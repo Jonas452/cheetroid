@@ -1,4 +1,4 @@
-package sape.cheetroid.lib.util;
+package sape.cheetroid.lib.exception;
 
 public class CCustomException extends RuntimeException
 {

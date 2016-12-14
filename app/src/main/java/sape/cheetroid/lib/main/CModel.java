@@ -8,14 +8,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
 
 import sape.cheetroid.lib.database.DatabaseConnector;
 import sape.cheetroid.lib.database.cfield.CFieldAnno;
 import sape.cheetroid.lib.database.cfield.CPrimaryKey;
 import sape.cheetroid.lib.database.ctable.CTableAnno;
-import sape.cheetroid.lib.util.CCustomException;
-import sape.cheetroid.lib.util.Util;
+import sape.cheetroid.lib.exception.CCustomException;
 
 public class CModel
 {
