@@ -2,10 +2,12 @@ package sape.cheetroid.lib.database.ctable;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+
 import sape.cheetroid.lib.database.cfield.CField;
 import sape.cheetroid.lib.database.cfield.CFieldAnno;
 import sape.cheetroid.lib.database.cfield.CPrimaryKey;
 import sape.cheetroid.lib.main.CModel;
+import sape.cheetroid.lib.util.CCustomException;
 
 public class CTable
 {
@@ -25,7 +27,12 @@ public class CTable
 
         String tableScript = "";
 
-        tableScript += CREATE_TABLE + " " + CModel.getTableName( myClass ) + " ( ";
+        String tableName = CModel.getTableName( myClass );
+
+        if( tableName == null )
+            throw new CCustomException( "There is no table name annotation for the Class " + myClass.getName() + "." );
+
+        tableScript += CREATE_TABLE + " " + tableName + " ( ";
 
         for( int i = 0; i < tableFields.size(); i++ )
         {

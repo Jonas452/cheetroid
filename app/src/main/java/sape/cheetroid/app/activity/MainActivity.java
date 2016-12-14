@@ -19,7 +19,7 @@ public class MainActivity extends Activity
         setContentView( R.layout.activity_main );
 
         //----------------------------------------------------------------------------------------------------
-        /*
+
         Usuario usuario1 = new Usuario();
 
         usuario1.login = "user452";
@@ -38,7 +38,7 @@ public class MainActivity extends Activity
         usuario1.store( getApplicationContext() );
         usuario2.store( getApplicationContext() );
         usuario3.store( getApplicationContext() );
-        */
+
         //----------------------------------------------------------------------------------------------------
 
         UsuarioController usuarioController = new UsuarioController( getApplicationContext() );

@@ -1,5 +1,7 @@
 package sape.cheetroid.lib.database.cfield;
 
+import sape.cheetroid.lib.util.CCustomException;
+
 /*
 Author = Jonas Jordão de Macêdo;
 Creation Date = 27/10/2016 (m/d/y);
@@ -39,6 +41,9 @@ public class CField
     */
     public CField( String fieldName, String fieldType, boolean isNotNull )
     {
+
+        if( !isFieldTypeValid( fieldType ) )
+            throw new CCustomException( "The type {" + fieldType + "} for the field {" + fieldName + "} is invalid." );
 
         this.fieldName = fieldName;
         this.fieldType = fieldType;

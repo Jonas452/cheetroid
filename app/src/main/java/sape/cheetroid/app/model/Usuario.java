@@ -21,7 +21,7 @@ public class Usuario extends CModel
 
     @CFieldAnno( fieldType = CField.TEXT, isNotNull =  true )
     public String password;
-
+    
     public Usuario() { }
 
     public Usuario( long id, Context context ) { super( id, context ); }

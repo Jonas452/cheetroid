@@ -13,10 +13,10 @@ public class DatabaseConfig
 {
 
     //Database name.
-    public static final String NAME = ".db"; //Ex.: blog.db
+    public static final String NAME = "test.db"; //Ex.: blog.db
 
     //Current database version.
-    public static final int VERSION = 1; //Only integer numbers.
+    public static final int VERSION = 1;
 
     private DatabaseConfig() {}
 

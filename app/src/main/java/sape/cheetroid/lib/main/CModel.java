@@ -14,6 +14,7 @@ import sape.cheetroid.lib.database.DatabaseConnector;
 import sape.cheetroid.lib.database.cfield.CFieldAnno;
 import sape.cheetroid.lib.database.cfield.CPrimaryKey;
 import sape.cheetroid.lib.database.ctable.CTableAnno;
+import sape.cheetroid.lib.util.CCustomException;
 import sape.cheetroid.lib.util.Util;
 
 public class CModel
@@ -364,7 +365,7 @@ public class CModel
 
     }
 
-    public static String getPrimaryKeyName(Class myModel )
+    public static String getPrimaryKeyName( Class myModel )
     {
 
         Field[] fields = myModel.getFields();
@@ -377,7 +378,7 @@ public class CModel
 
         }
 
-        return null;
+        throw new CCustomException( "There is no primary key annotation for the Class " + myModel.getName() + "." );
 
     }
 
