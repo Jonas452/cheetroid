@@ -5,7 +5,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import sape.cheetroid.app.database.DBCTables;
-import sape.cheetroid.lib.database.ctable.CTable;
 
 /*
 Author = Jonas Jordão de Macêdo;
@@ -39,6 +38,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper
     public void onUpgrade( SQLiteDatabase db, int oldVersion, int newVersion )
     {
 
+        new DBCUpdateScript();
 
     }
 

@@ -22,11 +22,4 @@ public class UsuarioController extends CController
 
     }
 
-    public ArrayList<Usuario> getAllByLogin( String login )
-    {
-
-        return  selectAll( "login = '" + login + "'", "login" );
-
-    }
-
 }

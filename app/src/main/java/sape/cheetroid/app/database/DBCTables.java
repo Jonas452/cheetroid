@@ -7,10 +7,7 @@ import sape.cheetroid.lib.database.ctable.CTablesHandler;
 public class DBCTables extends CTablesHandler
 {
 
-    /*
-     * TODO  Here you must add
-     * all yours tables.
-     */
+    //TODO Here you must add all yours tables.
     public DBCTables()
     {
 
