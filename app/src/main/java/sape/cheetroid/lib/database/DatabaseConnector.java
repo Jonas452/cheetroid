@@ -11,40 +11,41 @@ Author = Jonas Jordão de Macêdo;
 Creation Date = 26/10/2016 (m/d/y);
 
 Description =
-Helps to make connections to the local database.
+Helps to make connections to the local DATABASE_INSTANCE.
 */
 public class DatabaseConnector
 {
 
-    private SQLiteDatabase database;
-    private DatabaseOpenHelper databaseOpenHelper;
+    private static SQLiteDatabase DATABASE_INSTANCE;
+    private static DatabaseOpenHelper DATABASE_OPEN_HELPER;
 
     public DatabaseConnector( Context context )
     {
 
-        databaseOpenHelper = new DatabaseOpenHelper( context, DatabaseConfig.NAME, null, DatabaseConfig.VERSION );
+        DATABASE_OPEN_HELPER = new DatabaseOpenHelper( context, DatabaseConfig.NAME, null, DatabaseConfig.VERSION );
 
     }
 
     public void open() throws SQLException
     {
 
-        database = databaseOpenHelper.getWritableDatabase();
+        if( DATABASE_INSTANCE == null || !DATABASE_INSTANCE.isOpen() )
+            DATABASE_INSTANCE = DATABASE_OPEN_HELPER.getWritableDatabase();
 
     }
 
     public void close()
     {
 
-        if( database != null )
+        if( DATABASE_INSTANCE != null && DATABASE_INSTANCE.isOpen() )
         {
 
-            database.close();
+            DATABASE_INSTANCE.close();
 
         }
 
     }
 
-    public SQLiteDatabase getDatabase() { return this.database; }
+    public SQLiteDatabase getDatabase() { return this.DATABASE_INSTANCE; }
 
 }
