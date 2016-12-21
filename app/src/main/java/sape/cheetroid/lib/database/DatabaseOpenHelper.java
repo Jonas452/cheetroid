@@ -38,8 +38,6 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper
     public void onUpgrade( SQLiteDatabase db, int oldVersion, int newVersion )
     {
 
-        new DBCUpdateScript();
-
     }
 
 }
