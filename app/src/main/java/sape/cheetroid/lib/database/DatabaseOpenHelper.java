@@ -48,13 +48,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper
         {
 
             for( CTable table : tables.getAllTablesFromVersion( versionExecuteUpdate ) )
-            {
-
-                Log.e( "UPDATE " + versionExecuteUpdate, table.getTableScript() );
-
                 db.execSQL(table.getTableScript());
-
-            }
 
             versionExecuteUpdate++;
 
