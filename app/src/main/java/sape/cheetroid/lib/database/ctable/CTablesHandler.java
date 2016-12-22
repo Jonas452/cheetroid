@@ -5,12 +5,33 @@ import java.util.ArrayList;
 public class CTablesHandler
 {
 
-    public static ArrayList<String> DATABASE_TABLES_SCRIPTS = new ArrayList<String>();
+    public static ArrayList<CTable> DATABASE_TABLES = new ArrayList<CTable>();
 
-    public void addTableScript( String tableScript )
+    public void addTable( CTable table )
     {
 
-        DATABASE_TABLES_SCRIPTS.add( tableScript );
+        DATABASE_TABLES.add( table );
+
+    }
+
+    public ArrayList<CTable> getAllTablesFromVersion( int version )
+    {
+
+        ArrayList<CTable> tables = new ArrayList<CTable>();
+
+        for( CTable cTable : DATABASE_TABLES )
+        {
+
+            if( cTable.getVersion() == version )
+            {
+
+                tables.add( cTable );
+
+            }
+
+        }
+
+        return tables;
 
     }
 

@@ -3,8 +3,10 @@ package sape.cheetroid.lib.database;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import sape.cheetroid.app.database.DBCTables;
+import sape.cheetroid.lib.database.ctable.CTable;
 
 /*
 Author = Jonas Jordão de Macêdo;
@@ -27,16 +29,36 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper
     public void onCreate( SQLiteDatabase db )
     {
 
-        DBCTables tables = new DBCTables();
+        DBCTables tables = DBCTables.getInstance();
 
-        for( String tableScript : tables.DATABASE_TABLES_SCRIPTS )
-            db.execSQL( tableScript );
+        for( CTable table : tables.DATABASE_TABLES )
+            db.execSQL( table.getTableScript() );
 
     }
 
     @Override
     public void onUpgrade( SQLiteDatabase db, int oldVersion, int newVersion )
     {
+
+        DBCTables tables = DBCTables.getInstance();
+
+        int versionExecuteUpdate = oldVersion + 1;
+
+        do
+        {
+
+            for( CTable table : tables.getAllTablesFromVersion( versionExecuteUpdate ) )
+            {
+
+                Log.e( "UPDATE " + versionExecuteUpdate, table.getTableScript() );
+
+                db.execSQL(table.getTableScript());
+
+            }
+
+            versionExecuteUpdate++;
+
+        }while( versionExecuteUpdate <= newVersion );
 
     }
 

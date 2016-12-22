@@ -16,11 +16,20 @@ public class CTable
     private static final String CREATE_TABLE = "CREATE TABLE";
     //----------------------------------------------
 
-    private static ArrayList<CField> tableFields = new ArrayList<CField>();
+    private ArrayList<CField> tableFields = new ArrayList<CField>();
 
-    private CTable() {}
+    private Class myClass;
+    private int version;
 
-    public static String getTableScript( Class myClass )
+    public CTable( Class myClass )
+    {
+
+        this.myClass = myClass;
+        this.version = CModel.getTableVersion( this.myClass );
+
+    }
+
+    public String getTableScript()
     {
 
         prepareFields( myClass.getFields() );
@@ -52,7 +61,7 @@ public class CTable
 
     }
 
-    private static void prepareFields( Field[] fields )
+    private void prepareFields( Field[] fields )
     {
 
         for( Field field : fields )
@@ -76,18 +85,20 @@ public class CTable
 
     }
 
-    private static void addPrimaryKey( String fieldName )
+    private void addPrimaryKey( String fieldName )
     {
 
         tableFields.add( new CField( fieldName ) );
 
     }
 
-    private static void addField( String fieldName, String fieldType, boolean isNotNull )
+    private void addField( String fieldName, String fieldType, boolean isNotNull )
     {
 
         tableFields.add( new CField( fieldName, fieldType, isNotNull ) );
 
     }
+
+    public int getVersion(){ return this.version; }
 
 }

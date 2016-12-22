@@ -4,5 +4,6 @@ public @interface CTableAnno
 {
 
     String tableName();
+    int version() default 1;
 
 }

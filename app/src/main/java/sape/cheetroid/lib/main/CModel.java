@@ -337,6 +337,21 @@ public class CModel
 
     }
 
+    public static int getTableVersion( Class myModel )
+    {
+
+        if( myModel.isAnnotationPresent( CTableAnno.class ) )
+        {
+
+            CTableAnno annoTable = (CTableAnno) myModel.getAnnotation( CTableAnno.class );
+            return annoTable.version();
+
+        }
+
+        return -1;
+
+    }
+
     private long getPrimaryKeyValue()
     {
 
