@@ -21,22 +21,34 @@ public class CTable
     private Class myClass;
     private int version;
 
+    private String tableName;
+
+    private String tableScript;
+
     public CTable( Class myClass )
     {
 
         this.myClass = myClass;
         this.version = CModel.getTableVersion( this.myClass );
+        this.tableName = CModel.getTableName( this.myClass );
+
+        this.createTableScript();
 
     }
 
-    public String getTableScript()
+    public String getCreateTableScript()
+    {
+
+        return tableScript;
+
+    }
+
+    private void createTableScript()
     {
 
         prepareFields( myClass.getFields() );
 
-        String tableScript = "";
-
-        String tableName = CModel.getTableName( myClass );
+        tableScript = "";
 
         if( tableName == null )
             throw new CCustomException( "There is no table name annotation for the Class " + myClass.getName() + "." );
@@ -54,10 +66,6 @@ public class CTable
                 tableScript += ", ";
 
         }
-
-        tableFields.clear();
-
-        return tableScript;
 
     }
 
@@ -100,5 +108,9 @@ public class CTable
     }
 
     public int getVersion(){ return this.version; }
+
+    public String getTableName() { return this.tableName; }
+
+    public ArrayList<CField> getTableFields() { return this.tableFields; }
 
 }

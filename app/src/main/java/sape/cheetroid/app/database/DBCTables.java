@@ -1,8 +1,5 @@
 package sape.cheetroid.app.database;
 
-import sape.cheetroid.app.model.Casa;
-import sape.cheetroid.app.model.Cidade;
-import sape.cheetroid.app.model.Estado;
 import sape.cheetroid.app.model.Usuario;
 import sape.cheetroid.lib.database.ctable.CTable;
 import sape.cheetroid.lib.database.ctable.CTablesHandler;
@@ -17,9 +14,6 @@ public class DBCTables extends CTablesHandler
     {
 
         addTable( new CTable( Usuario.class ) );
-        addTable( new CTable( Cidade.class ) );
-        addTable( new CTable( Estado.class ) );
-        addTable( new CTable( Casa.class ) );
 
     }
 

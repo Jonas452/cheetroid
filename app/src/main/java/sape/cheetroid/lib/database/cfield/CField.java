@@ -114,4 +114,6 @@ public class CField
 
     }
 
+    public String getName() { return this.fieldName; }
+
 }
