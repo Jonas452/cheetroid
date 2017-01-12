@@ -2,6 +2,7 @@ package sape.cheetroid.lib.main;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;

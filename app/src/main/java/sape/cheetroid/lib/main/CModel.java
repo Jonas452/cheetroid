@@ -244,6 +244,17 @@ public class CModel
 
     }
 
+    public boolean storeWithId( Context context )
+    {
+
+        boolean wasStore;
+
+        wasStore = insert( context );
+
+        return wasStore;
+
+    }
+
     private boolean insert( Context context )
     {
 

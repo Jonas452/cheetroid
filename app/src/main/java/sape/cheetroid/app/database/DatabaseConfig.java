@@ -16,7 +16,7 @@ public class DatabaseConfig
     public static final String NAME = "test.db"; //Ex.: blog.db
 
     //Current database version.
-    public static final int VERSION = 1;
+    public static final int VERSION = 2;
 
     private DatabaseConfig() {}
 

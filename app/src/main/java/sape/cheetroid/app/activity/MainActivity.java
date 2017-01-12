@@ -1,22 +1,26 @@
 package sape.cheetroid.app.activity;
 
 import android.app.Activity;
+import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
 import org.json.JSONArray;
-
-import java.util.ArrayList;
+import org.json.JSONObject;
 
 import sape.cheetroid.R;
-import sape.cheetroid.app.model.Usuario;
-import sape.cheetroid.lib.util.CJSONHandler;
+import sape.cheetroid.app.control.MunicipioController;
+import sape.cheetroid.app.model.Municipio;
+import sape.cheetroid.lib.util.CJSONUtil;
+import sape.cheetroid.lib.webservice.ServiceHandler;
 
 public class MainActivity extends Activity
 {
 
     private TextView textView;
+    private Context context;
 
     @Override
     protected void onCreate( Bundle savedInstanceState )
@@ -27,47 +31,49 @@ public class MainActivity extends Activity
 
         textView = (TextView) findViewById( R.id.textViewTest );
 
-        //------------------------------------------
+        context = getApplicationContext();
 
-        Usuario usuario1 = new Usuario( 1, getApplicationContext() );
-        Usuario usuario2 = new Usuario( 2, getApplicationContext() );
-        Usuario usuario3 = new Usuario( 3, getApplicationContext() );
+        new asyncTest().execute();
 
-        //------------------------------------------
+    }
 
-        JSONArray jsonArray = new JSONArray();
+    class asyncTest extends AsyncTask< Void, Void, Void >
+    {
 
-        jsonArray.put( usuario1.toJSON() );
-        jsonArray.put( usuario2.toJSON() );
-        jsonArray.put( usuario3.toJSON() );
+        @Override
+        protected Void doInBackground(Void... voids)
+        {
 
-        addText( "JSON ARRAY FROM MODELS:" );
-        addText( jsonArray.toString() );
+            ServiceHandler sh = new ServiceHandler();
+            JSONObject webserviceReturn = sh.makeServiceCall( "http://ceres.rn.gov.br/v2/app/services/ceres_cidadao/MunicipioWebservice.class.php", ServiceHandler.GET );
 
-        addText( "" );
+            CJSONUtil jsonUtil = new CJSONUtil( webserviceReturn );
+            JSONArray dados = jsonUtil.getJSONArray( "dados" );
 
-        //------------------------------------------
+            for( int i = 0; i < dados.length(); i++ )
+            {
 
-        CJSONHandler cjsonHandler = new CJSONHandler( Usuario.class );
+                Municipio municipio = new Municipio( CJSONUtil.getJSONObject( dados, i ) );
+                municipio.storeWithId( context );
 
-        ArrayList<Usuario> usuarioArrayList = cjsonHandler.fromJSONArrayToMyModelArrayList( jsonArray );
+            }
 
-        addText( "MY MODELS FROM JSON ARRAY:" );
+            return null;
 
-        for( Usuario usuario : usuarioArrayList )
-            addText( usuario.id + " " + usuario.login + " " + usuario.password );
+        }
 
-        //------------------------------------------
+        @Override
+        protected void onPostExecute( Void result )
+        {
 
-        JSONArray jsonArray2 = cjsonHandler.fromMyModelArrayListToJSONArray( usuarioArrayList );
+            super.onPostExecute(result);
 
-        addText( "" );
-        addText( "JSON ARRAY FROM MODELS ARRAY LIST:" );
-        addText( jsonArray2.toString() );
+            MunicipioController municipioController = new MunicipioController( context );
 
-        addText( "" );
+            for( Municipio municipio : municipioController.getAll() )
+                addText( municipio.id + " " + municipio.nome + "\n" );
 
-        //------------------------------------------
+        }
 
     }
 
