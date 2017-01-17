@@ -238,7 +238,7 @@ public class CModel
         if( hasPrimaryKeyValue() )
             wasStore = update( context );
         else
-            wasStore = insert( context );
+            wasStore = insert( context, false );
 
         return wasStore;
 
@@ -249,20 +249,20 @@ public class CModel
 
         boolean wasStore;
 
-        wasStore = insert( context );
+        wasStore = insert( context, true );
 
         return wasStore;
 
     }
 
-    private boolean insert( Context context )
+    private boolean insert( Context context, boolean withId )
     {
 
         long insertedSuccessfully;
 
         DatabaseConnector databaseConnector = new DatabaseConnector( context );
 
-        ContentValues contentValues = this.toContentValues( false );
+        ContentValues contentValues = this.toContentValues( withId );
 
         databaseConnector.open();
 
