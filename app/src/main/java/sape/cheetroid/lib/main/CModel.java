@@ -1,8 +1,10 @@
 package sape.cheetroid.lib.main;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.view.View;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -115,50 +117,104 @@ public class CModel
         for( Field field : this.getClass().getFields() )
         {
 
-            try
+            if( field.isAnnotationPresent( CFieldAnno.class ) || field.isAnnotationPresent( CPrimaryKey.class ) ) {
+
+                try {
+
+                    if (jsonObject.has(field.getName())) {
+
+                        if (int.class == field.getType()) {
+
+                            field.setInt(this, jsonObject.getInt(field.getName()));
+
+                        } else if (long.class == field.getType()) {
+
+                            field.setLong(this, jsonObject.getLong(field.getName()));
+
+                        } else if (double.class == field.getType()) {
+
+                            field.setDouble(this, jsonObject.getDouble(field.getName()));
+
+                        } else if (boolean.class == field.getType()) {
+
+                            field.setBoolean(this, jsonObject.getBoolean(field.getName()));
+
+                        } else if (String.class == field.getType()) {
+
+                            field.set(this, jsonObject.getString(field.getName()));
+
+                        }
+
+                    }
+
+                } catch (IllegalAccessException e) {
+
+                    e.printStackTrace();
+
+                } catch (JSONException e) {
+
+                    e.printStackTrace();
+
+                }
+
+            }
+
+        }
+
+    }
+
+    public CModel( Activity activity )
+    {
+
+        setTableName();
+        setPrimaryKeyName();
+
+        View view = activity.getWindow().getDecorView().getRootView();
+
+        for( Field field : this.getClass().getFields() )
+        {
+
+            if( field.isAnnotationPresent( CFieldAnno.class ) || field.isAnnotationPresent( CPrimaryKey.class ) )
             {
 
-                if( jsonObject.has( field.getName() ) )
+                String fieldName = field.getName().toLowerCase();
+
+                try
                 {
 
                     if( int.class == field.getType() )
                     {
 
-                        field.setInt( this, jsonObject.getInt( field.getName() ) );
+                        field.setInt(this, 1);
 
                     }else if( long.class == field.getType() )
                     {
 
-                        field.setLong( this, jsonObject.getLong( field.getName() ) );
+                        field.setLong(this, 2);
 
                     }else if( double.class == field.getType() )
                     {
 
-                        field.setDouble( this, jsonObject.getDouble( field.getName() ) );
+                        field.setDouble(this, 3);
 
                     }else if( boolean.class == field.getType() )
                     {
 
-                        field.setBoolean( this, jsonObject.getBoolean( field.getName() ) );
+                        field.setBoolean(this, true);
 
                     }else if( String.class == field.getType() )
                     {
 
-                        field.set( this, jsonObject.getString( field.getName() ) );
+                        field.set(this, "");
 
                     }
 
+                }catch( IllegalAccessException e )
+                {
+
+                    e.printStackTrace();
+
                 }
-
-            }catch( IllegalAccessException e )
-            {
-
-                e.printStackTrace();
-
-            }catch( JSONException e )
-            {
-
-                e.printStackTrace();
 
             }
 
