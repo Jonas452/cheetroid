@@ -1,20 +1,25 @@
 package sape.cheetroid.lib.main;
 
-import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 
-import sape.cheetroid.lib.database.DatabaseConnector;
 import sape.cheetroid.lib.database.cfield.CFieldAnno;
 import sape.cheetroid.lib.database.cfield.CPrimaryKey;
 import sape.cheetroid.lib.database.ctable.CTableAnno;
+import sape.cheetroid.lib.database.DatabaseConnector;
 import sape.cheetroid.lib.exception.CCustomException;
 
 public class CModel
@@ -22,6 +27,8 @@ public class CModel
 
     private String tableName;
     private String primaryKeyName;
+
+    private ArrayList<View> childsView;
 
     public CModel()
     {
@@ -59,41 +66,7 @@ public class CModel
                 int fieldIndex = cursor.getColumnIndex( tempField.getName() );
 
                 if( fieldIndex != - 1 )
-                {
-
-                    try
-                    {
-
-                        if( int.class == tempField.getType() )
-                        {
-
-                            tempField.setInt( this, cursor.getInt( fieldIndex ) );
-
-                        }else if( long.class == tempField.getType() )
-                        {
-
-                            tempField.setLong( this, cursor.getLong( fieldIndex ) );
-
-                        }else if( double.class == tempField.getType() )
-                        {
-
-                            tempField.setDouble( this, cursor.getDouble( fieldIndex ) );
-
-                        }else if( String.class == tempField.getType() )
-                        {
-
-                            tempField.set( this, cursor.getString( fieldIndex ) );
-
-                        }
-
-                    }catch( IllegalAccessException e )
-                    {
-
-                        e.printStackTrace();
-
-                    }
-
-                }
+                    setFieldValue( tempField, cursor.getString( fieldIndex ) );
 
             }
 
@@ -117,41 +90,17 @@ public class CModel
         for( Field field : this.getClass().getFields() )
         {
 
-            if( field.isAnnotationPresent( CFieldAnno.class ) || field.isAnnotationPresent( CPrimaryKey.class ) ) {
+            if( field.isAnnotationPresent( CFieldAnno.class ) || field.isAnnotationPresent( CPrimaryKey.class ) )
+            {
 
-                try {
+                try
+                {
 
-                    if (jsonObject.has(field.getName())) {
+                    if( jsonObject.has( field.getName() ) )
+                        setFieldValue( field, jsonObject.getString( field.getName() ) );
 
-                        if (int.class == field.getType()) {
-
-                            field.setInt(this, jsonObject.getInt(field.getName()));
-
-                        } else if (long.class == field.getType()) {
-
-                            field.setLong(this, jsonObject.getLong(field.getName()));
-
-                        } else if (double.class == field.getType()) {
-
-                            field.setDouble(this, jsonObject.getDouble(field.getName()));
-
-                        } else if (boolean.class == field.getType()) {
-
-                            field.setBoolean(this, jsonObject.getBoolean(field.getName()));
-
-                        } else if (String.class == field.getType()) {
-
-                            field.set(this, jsonObject.getString(field.getName()));
-
-                        }
-
-                    }
-
-                } catch (IllegalAccessException e) {
-
-                    e.printStackTrace();
-
-                } catch (JSONException e) {
+                }catch( JSONException e )
+                {
 
                     e.printStackTrace();
 
@@ -163,56 +112,48 @@ public class CModel
 
     }
 
-    public CModel( Activity activity )
+    public CModel( LinearLayout linearLayout, Context context )
     {
+
+        childsView = new ArrayList<View>();
 
         setTableName();
         setPrimaryKeyName();
 
-        View view = activity.getWindow().getDecorView().getRootView();
+        final int childCount = linearLayout.getChildCount();
 
-        for( Field field : this.getClass().getFields() )
+        for( int i = 0; i < childCount; i++ )
         {
 
-            if( field.isAnnotationPresent( CFieldAnno.class ) || field.isAnnotationPresent( CPrimaryKey.class ) )
+            final View myChild = linearLayout.getChildAt( i );
+            Field field = null;
+
+            String fieldName = treatFieldName( myChild, context );
+
+            if( fieldName != null  )
+                field = getFieldByName( fieldName );
+
+            Log.e( "FIELD", fieldName + "" );
+
+            if( field != null )
             {
 
-                String fieldName = field.getName().toLowerCase();
+                String value = String.valueOf( ( ( EditText ) myChild ).getText() );
 
-                try
+                Log.e( "VALUE", value + "" );
+
+                if( value != null && value.length() > 0 )
                 {
 
-                    if( int.class == field.getType() )
-                    {
+                    setFieldValue( field, value );
 
-                        field.setInt(this, 1);
-
-                    }else if( long.class == field.getType() )
-                    {
-
-                        field.setLong(this, 2);
-
-                    }else if( double.class == field.getType() )
-                    {
-
-                        field.setDouble(this, 3);
-
-                    }else if( boolean.class == field.getType() )
-                    {
-
-                        field.setBoolean(this, true);
-
-                    }else if( String.class == field.getType() )
-                    {
-
-                        field.set(this, "");
-
-                    }
-
-                }catch( IllegalAccessException e )
+                }else
                 {
 
-                    e.printStackTrace();
+                    CFieldAnno annoField = field.getAnnotation( CFieldAnno.class );
+
+                    if( annoField.isNotNull() )
+                        childsView.add( linearLayout.getChildAt( i - 1 ) );
 
                 }
 
@@ -362,7 +303,7 @@ public class CModel
 
     }
 
-    public boolean delete(  Context context  )
+    public boolean delete( Context context )
     {
 
         DatabaseConnector databaseConnector = new DatabaseConnector( context );
@@ -554,5 +495,108 @@ public class CModel
     }
 
     //--------------- END TABLE HANDLING ---------------------
+
+    //------------- BEGIN FORM HANDLING ----------------------
+
+    private Field getFieldByName( String fieldName )
+    {
+
+        try
+        {
+
+            return this.getClass().getField( fieldName );
+
+        }catch( NoSuchFieldException e )
+        {
+
+            e.printStackTrace();
+
+        }
+
+        return null;
+
+    }
+
+    private String treatFieldName( View view, Context context )
+    {
+
+        String fieldName = context.getResources().getResourceEntryName( view.getId() );
+
+        fieldName = fieldName.toLowerCase();
+
+        if( view instanceof EditText )
+            return  fieldName.replace( ( tableName + "edittext" ).toLowerCase(), "" );
+        else if( view instanceof TextView )
+            ( ( TextView ) view ).setTextColor( Color.BLACK );
+
+        return null;
+
+    }
+
+    private void setFieldValue( Field field, String value )
+    {
+
+        try
+        {
+
+            if( int.class == field.getType() )
+            {
+
+                field.setInt( this, Integer.parseInt( value ) );
+
+            }else if( long.class == field.getType() )
+            {
+
+                field.setLong( this, Long.parseLong( value) );
+
+            }else if( double.class == field.getType() )
+            {
+
+                field.setDouble( this, Double.parseDouble( value ) );
+
+            }else if( boolean.class == field.getType() )
+            {
+
+                field.setBoolean( this, Boolean.parseBoolean( value ) );
+
+            }else if( String.class == field.getType() )
+            {
+
+                field.set( this, value );
+
+            }
+
+        }catch( IllegalAccessException e )
+        {
+
+            e.printStackTrace();
+
+        }
+
+    }
+
+    public boolean validate()
+    {
+
+        if( childsView.size() > 0 )
+        {
+
+            for( View view : childsView )
+            {
+
+                if( view instanceof TextView )
+                    ( ( TextView ) view ).setTextColor( Color.RED );
+
+            }
+
+            return false;
+
+        }
+
+        return true;
+
+    }
+
+    //------------- END FORM HANDLING ----------------------
 
 }
